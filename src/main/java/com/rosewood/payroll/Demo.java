@@ -1,35 +1,16 @@
-
 package com.rosewood.payroll;
 
 import com.rosewood.payroll.exception.EmployeeNotFoundException;
 import com.rosewood.payroll.tax.BandBasedTaxCalculator;
-import com.rosewood.payroll.tax.TaxBand;
+import com.rosewood.payroll.tax.TaxBandFactory;
 import com.rosewood.payroll.tax.TaxCalculator;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
 
 public class Demo {
 
     public static void main(String[] args) {
-
-        List<TaxBand> taxBands = List.of(
-                new TaxBand("LOW",
-                        new BigDecimal("0"),
-                        new BigDecimal("1000"),
-                        new BigDecimal("0.05")),
-
-                new TaxBand("MEDIUM",
-                        new BigDecimal("1000"),
-                        new BigDecimal("5000"),
-                        new BigDecimal("0.15")),
-
-                new TaxBand("HIGH",
-                        new BigDecimal("5000"),
-                        null,
-                        new BigDecimal("0.25"))
-        );
 
         EmployeeRepository employeeRepository =
                 new InMemoryEmployeeRepository();
@@ -38,7 +19,9 @@ public class Demo {
                 new GrossPayCalculator();
 
         TaxCalculator taxCalculator =
-                new BandBasedTaxCalculator(taxBands);
+                new BandBasedTaxCalculator(
+                        TaxBandFactory.createDefaultTaxBands()
+                );
 
         PayrollCalculator payrollCalculator = new PayrollCalculator(
                 employeeRepository,
