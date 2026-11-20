@@ -1,5 +1,6 @@
 package com.rosewood.payroll.tax;
 
+import com.rosewood.payroll.exception.InvalidPayrollInputException;
 import com.rosewood.payroll.exception.InvalidTaxConfigurationException;
 
 import java.math.BigDecimal;
@@ -28,11 +29,10 @@ public class BandBasedTaxCalculator implements TaxCalculator {
 
     @Override
     public BigDecimal calculateTax(BigDecimal grossPay) {
-
         Objects.requireNonNull(grossPay, "Gross pay cannot be null");
 
         if (grossPay.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException(
+            throw new InvalidPayrollInputException(
                     "Gross pay cannot be negative");
         }
 
@@ -57,8 +57,7 @@ public class BandBasedTaxCalculator implements TaxCalculator {
 
                 throw new InvalidTaxConfigurationException(
                         "Tax bands must be continuous and non-overlapping: "
-                                + current.name() + " and " + next.name()
-                );
+                                + current.name() + " and " + next.name());
             }
         }
     }

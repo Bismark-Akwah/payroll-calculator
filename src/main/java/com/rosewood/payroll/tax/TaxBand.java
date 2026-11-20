@@ -1,5 +1,7 @@
 package com.rosewood.payroll.tax;
 
+import com.rosewood.payroll.exception.InvalidTaxConfigurationException;
+
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -15,24 +17,24 @@ public record TaxBand(
         Objects.requireNonNull(taxRate, "Tax rate cannot be null");
 
         if (name.isBlank()) {
-            throw new IllegalArgumentException(
+            throw new InvalidTaxConfigurationException(
                     "Tax band name cannot be blank");
         }
 
         if (lowerBound.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException(
+            throw new InvalidTaxConfigurationException(
                     "Lower bound cannot be negative");
         }
 
         if (upperBound != null
                 && upperBound.compareTo(lowerBound) <= 0) {
-            throw new IllegalArgumentException(
+            throw new InvalidTaxConfigurationException(
                     "Upper bound must be greater than lower bound");
         }
 
         if (taxRate.compareTo(BigDecimal.ZERO) < 0
                 || taxRate.compareTo(BigDecimal.ONE) > 0) {
-            throw new IllegalArgumentException(
+            throw new InvalidTaxConfigurationException(
                     "Tax rate must be between 0 and 1");
         }
     }
