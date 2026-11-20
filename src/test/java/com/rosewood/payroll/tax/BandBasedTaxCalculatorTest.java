@@ -1,4 +1,3 @@
-
 package com.rosewood.payroll.tax;
 
 import com.rosewood.payroll.exception.InvalidPayrollInputException;
@@ -142,6 +141,68 @@ class BandBasedTaxCalculatorTest {
         assertThrows(
                 InvalidTaxConfigurationException.class,
                 () -> new BandBasedTaxCalculator(taxBandsWithGap)
+        );
+    }
+
+    @Test
+    void calculatesCorrectTaxWhenTaxBandsAreUnsorted() {
+        List<TaxBand> unsortedBands = List.of(
+                new TaxBand(
+                        "HIGH",
+                        new BigDecimal("5000"),
+                        null,
+                        new BigDecimal("0.25")
+                ),
+                new TaxBand(
+                        "LOW",
+                        BigDecimal.ZERO,
+                        new BigDecimal("1000"),
+                        new BigDecimal("0.05")
+                ),
+                new TaxBand(
+                        "MEDIUM",
+                        new BigDecimal("1000"),
+                        new BigDecimal("5000"),
+                        new BigDecimal("0.15")
+                )
+        );
+
+        TaxCalculator unsortedCalculator =
+                new BandBasedTaxCalculator(unsortedBands);
+
+        BigDecimal tax = unsortedCalculator.calculateTax(
+                new BigDecimal("800")
+        );
+
+        assertMoneyEquals("40", tax);
+    }
+
+    @Test
+    void calculatesZeroTaxForZeroGrossPay() {
+        BigDecimal tax = taxCalculator.calculateTax(BigDecimal.ZERO);
+
+        assertMoneyEquals("0", tax);
+    }
+
+    @Test
+    void throwsExceptionWhenNoTaxBandCoversGrossPay() {
+        List<TaxBand> incompleteBands = List.of(
+                new TaxBand(
+                        "MEDIUM",
+                        new BigDecimal("1000"),
+                        new BigDecimal("5000"),
+                        new BigDecimal("0.15")
+                )
+        );
+
+        TaxCalculator incompleteCalculator =
+                new BandBasedTaxCalculator(incompleteBands);
+
+        assertThrows(
+                InvalidTaxConfigurationException.class,
+                () -> incompleteCalculator.calculateTax(
+                        new BigDecimal("800")
+                )
         );
     }
 
