@@ -1,5 +1,3 @@
-
-
 # Rosewood Payroll Calculator
 
 ## 1. Overview
@@ -38,7 +36,7 @@ An employee works 50 hours at GHS 30 per hour.
 
 Tax is calculated as a flat percentage of the employee's entire gross pay, based on the applicable tax band.
 
-| Gross pay | Tax rate |
+| **Gross pay** | **Tax rate** |
 |---|---:|
 | Below GHS 1,000 | 5% |
 | GHS 1,000 to below GHS 5,000 | 15% |
@@ -61,6 +59,7 @@ code-quality-c-rosewood-payroll/
 │   │           ├── tax/
 │   │           │   ├── BandBasedTaxCalculator.java
 │   │           │   ├── TaxBand.java
+│   │           │   ├── TaxBandFactory.java
 │   │           │   └── TaxCalculator.java
 │   │           ├── Demo.java
 │   │           ├── Employee.java
@@ -88,13 +87,33 @@ code-quality-c-rosewood-payroll/
 ## 5. Technologies
 
 - **Java 21** – Main programming language.
-- **Maven** – Project and dependency management.
+- **Apache Maven 3.10.1** – Project and dependency management.
 - **JUnit 5** – Unit and integration testing.
 - **Mockito** – Mocking dependencies in unit tests.
-- **BigDecimal** – Accurate decimal arithmetic for financial calculations.
+- **BigDecimal** – Decimal arithmetic for financial calculations.
+- **JaCoCo** – Code coverage analysis.
+- **PIT** – Mutation testing.
 - **IntelliJ IDEA** – Development environment.
 
-## 6. Running the Application
+## 6. Prerequisites and Setup
+
+Before running the project, ensure the following are installed:
+
+- **JDK 21** – Required to compile and run the application.
+- **Apache Maven 3.10.1** – Required for Maven build and test commands.
+
+For command-line execution, Maven must be installed and its `bin` directory added to the system PATH.
+
+To verify the installations, open PowerShell or a terminal and run:
+
+```bash
+java -version
+mvn -version
+```
+
+Both commands should display their respective installed versions.
+
+## 7. Running the Application
 
 The application can be run directly from IntelliJ IDEA.
 
@@ -104,15 +123,15 @@ The application can be run directly from IntelliJ IDEA.
 4. Click the green Run icon beside the `main` method, or right-click the file and select **Run 'Demo.main()'**.
 5. View the output in the Run console.
 
-**Prerequisite:** Ensure that JDK 21 is configured for the project.
+Ensure that JDK 21 is configured for the project.
 
 The `Demo` class provides sample payroll calculations using the in-memory employee repository and configured tax bands.
 
-## 7. Running the Tests
+## 8. Running the Tests
 
-The project includes six test classes covering individual components and the overall payroll calculation flow.
+The project includes **six test classes** covering individual components and the overall payroll calculation flow.
 
-To run all tests using IntelliJ IDEA:
+### Using IntelliJ IDEA
 
 1. Open the project in IntelliJ IDEA.
 2. Locate the `src/test/java` directory in the Project panel.
@@ -120,9 +139,23 @@ To run all tests using IntelliJ IDEA:
 4. Select **Run 'All Tests'**.
 5. View the test results in the Run window.
 
+### Using Maven
+
+Open a terminal in the project root directory and run:
+
+```bash
+mvn clean test
+```
+
+To run the full Maven verification lifecycle, use:
+
+```bash
+mvn clean verify
+```
+
 ### Test coverage
 
-| Test class | What it verifies |
+| **Test class** | **What it verifies** |
 |---|---|
 | `EmployeeTest` | Employee creation and input validation |
 | `GrossPayCalculatorTest` | Gross pay and overtime calculations |
@@ -131,14 +164,50 @@ To run all tests using IntelliJ IDEA:
 | `BandBasedTaxCalculatorTest` | Tax band selection, tax calculation, and configuration validation |
 | `PayrollIntegrationTest` | Integration of the payroll components |
 
-## 8. Documentation
+### Code coverage with JaCoCo
+
+JaCoCo is configured in the Maven build to measure test coverage.
+
+Run:
+
+```bash
+mvn clean verify
+```
+
+After successful execution, open the generated HTML report:
+
+```text
+target/site/jacoco/index.html
+```
+
+The report provides coverage information at project, package, class, and line levels.
+
+### Mutation testing with PIT
+
+PIT is configured in the Maven build to assess how effectively the tests detect changes in application behaviour.
+
+Run:
+
+```bash
+mvn test-compile org.pitest:pitest-maven:mutationCoverage
+```
+
+After successful execution, open the generated HTML report:
+
+```text
+target/pit-reports/index.html
+```
+
+The PIT report shows which mutations were killed, survived, or were not covered by the test suite.
+
+## 9. Documentation
 
 The project includes two additional documents:
 
 - **Analysis.md** – Describes the problems, code smells, design weaknesses, and testing issues identified in the original implementation.
 - **DesignRationale.md** – Explains the design decisions made during the refactoring, including separation of responsibilities, dependency injection, configurable tax bands, exception handling, and the use of `BigDecimal`.
 
-## 9. Key Design Improvements
+## 10. Key Design Improvements
 
 The refactoring introduces the following improvements:
 
@@ -150,4 +219,4 @@ The refactoring introduces the following improvements:
 - **Meaningful exceptions:** Specific exceptions communicate problems such as missing employees and invalid payroll inputs.
 - **Financial accuracy:** `BigDecimal` replaces `double` for monetary calculations.
 - **Automated testing:** Unit and integration tests verify expected behaviour and important edge cases.
-
+- **Mutation testing:** PIT helps assess whether the test suite detects unintended changes in application behaviour.
