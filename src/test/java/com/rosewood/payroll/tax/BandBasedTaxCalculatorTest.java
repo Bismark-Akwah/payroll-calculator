@@ -1,5 +1,7 @@
+
 package com.rosewood.payroll.tax;
 
+import com.rosewood.payroll.exception.InvalidPayrollInputException;
 import com.rosewood.payroll.exception.InvalidTaxConfigurationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,24 +17,9 @@ class BandBasedTaxCalculatorTest {
 
     @BeforeEach
     void setUp() {
-        List<TaxBand> taxBands = List.of(
-                new TaxBand("LOW",
-                        new BigDecimal("0"),
-                        new BigDecimal("1000"),
-                        new BigDecimal("0.05")),
-
-                new TaxBand("MEDIUM",
-                        new BigDecimal("1000"),
-                        new BigDecimal("5000"),
-                        new BigDecimal("0.15")),
-
-                new TaxBand("HIGH",
-                        new BigDecimal("5000"),
-                        null,
-                        new BigDecimal("0.25"))
+        taxCalculator = new BandBasedTaxCalculator(
+                TaxBandFactory.createDefaultTaxBands()
         );
-
-        taxCalculator = new BandBasedTaxCalculator(taxBands);
     }
 
     @Test
@@ -83,7 +70,7 @@ class BandBasedTaxCalculatorTest {
     @Test
     void rejectsNegativeGrossPay() {
         assertThrows(
-                IllegalArgumentException.class,
+                InvalidPayrollInputException.class,
                 () -> taxCalculator.calculateTax(
                         new BigDecimal("-100")
                 )
@@ -109,20 +96,52 @@ class BandBasedTaxCalculatorTest {
     @Test
     void rejectsOverlappingTaxBands() {
         List<TaxBand> overlappingBands = List.of(
-                new TaxBand("LOW",
+                new TaxBand(
+                        "LOW",
                         new BigDecimal("0"),
                         new BigDecimal("2000"),
-                        new BigDecimal("0.05")),
-
-                new TaxBand("HIGH",
+                        new BigDecimal("0.05")
+                ),
+                new TaxBand(
+                        "HIGH",
                         new BigDecimal("1000"),
                         null,
-                        new BigDecimal("0.25"))
+                        new BigDecimal("0.25")
+                )
         );
 
         assertThrows(
                 InvalidTaxConfigurationException.class,
                 () -> new BandBasedTaxCalculator(overlappingBands)
+        );
+    }
+
+    @Test
+    void rejectsGapsBetweenTaxBands() {
+        List<TaxBand> taxBandsWithGap = List.of(
+                new TaxBand(
+                        "LOW",
+                        new BigDecimal("0"),
+                        new BigDecimal("1000"),
+                        new BigDecimal("0.05")
+                ),
+                new TaxBand(
+                        "MEDIUM",
+                        new BigDecimal("1500"),
+                        new BigDecimal("5000"),
+                        new BigDecimal("0.15")
+                ),
+                new TaxBand(
+                        "HIGH",
+                        new BigDecimal("5000"),
+                        null,
+                        new BigDecimal("0.25")
+                )
+        );
+
+        assertThrows(
+                InvalidTaxConfigurationException.class,
+                () -> new BandBasedTaxCalculator(taxBandsWithGap)
         );
     }
 

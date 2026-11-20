@@ -1,4 +1,3 @@
-
 package com.rosewood.payroll;
 
 import com.rosewood.payroll.exception.EmployeeNotFoundException;
