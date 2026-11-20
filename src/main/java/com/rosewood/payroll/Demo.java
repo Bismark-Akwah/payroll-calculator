@@ -1,6 +1,8 @@
 package com.rosewood.payroll;
 
 import com.rosewood.payroll.exception.EmployeeNotFoundException;
+import com.rosewood.payroll.exception.InvalidPayrollInputException;
+import com.rosewood.payroll.exception.InvalidTaxConfigurationException;
 import com.rosewood.payroll.tax.BandBasedTaxCalculator;
 import com.rosewood.payroll.tax.TaxBandFactory;
 import com.rosewood.payroll.tax.TaxCalculator;
@@ -76,7 +78,10 @@ public class Demo {
             System.out.println("Tax: GHS " + formatMoney(result.taxAmount()));
             System.out.println("Net pay: GHS " + formatMoney(result.netPay()));
 
-        } catch (EmployeeNotFoundException exception) {
+        } catch (EmployeeNotFoundException
+                 | InvalidPayrollInputException
+                 | InvalidTaxConfigurationException exception) {
+
             System.out.println("\nPayroll could not be calculated: "
                     + exception.getMessage());
         }
