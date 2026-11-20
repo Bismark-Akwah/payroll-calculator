@@ -1,37 +1,58 @@
 package com.rosewood.payroll;
 
+import com.rosewood.payroll.exception.EmployeeNotFoundException;
+import com.rosewood.payroll.exception.InvalidPayrollInputException;
+import com.rosewood.payroll.tax.TaxCalculator;
+
+import java.math.BigDecimal;
+import java.util.Objects;
+
 public class PayrollCalculator {
 
-    // The calculator makes its own repository, so callers and tests cannot give it another.
-    private final EmployeeRepository repository = new InMemoryEmployeeRepository();
+    private final EmployeeRepository employeeRepository;
+    private final GrossPayCalculator grossPayCalculator;
+    private final TaxCalculator taxCalculator;
 
-    public double calculateNetPay(String employeeId, double hoursWorked, double hourlyRate) {
-        try {
-            Employee employee = repository.findById(employeeId);
+    public PayrollCalculator(
+            EmployeeRepository employeeRepository,
+            GrossPayCalculator grossPayCalculator,
+            TaxCalculator taxCalculator) {
 
-            double gross = hoursWorked * hourlyRate;
+        this.employeeRepository = Objects.requireNonNull(
+                employeeRepository, "Employee repository cannot be null");
 
-            // overtime: extra hours beyond 40 are paid at time-and-a-half
-            if (hoursWorked > 40) {
-                gross = gross + (hoursWorked - 40) * hourlyRate * 0.5;
-            }
+        this.grossPayCalculator = Objects.requireNonNull(
+                grossPayCalculator, "Gross pay calculator cannot be null");
 
-            // tax band, worked out from gross pay
-            double taxRate;
-            if (gross < 1000) {
-                taxRate = 0.05;      // LOW
-            } else if (gross < 5000) {
-                taxRate = 0.15;      // MEDIUM
-            } else {
-                taxRate = 0.25;      // HIGH
-            }
+        this.taxCalculator = Objects.requireNonNull(
+                taxCalculator, "Tax calculator cannot be null");
+    }
 
-            double net = gross - (gross * taxRate);
-            System.out.println("Net pay for " + employee.getName() + ": GHS " + net);
-            return net;
-        } catch (Exception e) {
-            // something went wrong (for example the employee was not found) - return zero
-            return 0;
+    public PayrollResult calculateNetPay(
+            String employeeId,
+            BigDecimal hoursWorked,
+            BigDecimal hourlyRate) {
+
+        if (employeeId == null || employeeId.isBlank()) {
+            throw new InvalidPayrollInputException(
+                    "Employee ID cannot be null or blank");
         }
+
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
+
+        BigDecimal grossPay = grossPayCalculator.calculateGrossPay(
+                hoursWorked, hourlyRate);
+
+        BigDecimal taxAmount = taxCalculator.calculateTax(grossPay);
+
+        BigDecimal netPay = grossPay.subtract(taxAmount);
+
+        return new PayrollResult(
+                employee.getId(),
+                employee.getName(),
+                grossPay,
+                taxAmount,
+                netPay);
     }
 }
