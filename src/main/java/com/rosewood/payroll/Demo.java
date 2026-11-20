@@ -14,6 +14,17 @@ import java.util.List;
 public class Demo {
 
     public static void main(String[] args) {
+        try {
+            runDemo();
+        } catch (InvalidTaxConfigurationException exception) {
+            System.out.println(
+                    "Payroll application could not start: "
+                            + exception.getMessage()
+            );
+        }
+    }
+
+    private static void runDemo() {
 
         EmployeeRepository employeeRepository =
                 new InMemoryEmployeeRepository(
