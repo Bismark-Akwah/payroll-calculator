@@ -1,5 +1,8 @@
 package com.rosewood.payroll;
 
+import java.util.Optional;
+
 public interface EmployeeRepository {
-    Employee findById(String id);
+
+    Optional<Employee> findById(String id);
 }
