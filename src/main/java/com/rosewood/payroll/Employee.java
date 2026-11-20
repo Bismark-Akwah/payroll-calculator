@@ -1,4 +1,7 @@
+
 package com.rosewood.payroll;
+
+import com.rosewood.payroll.exception.InvalidPayrollInputException;
 
 import java.util.Objects;
 
@@ -8,16 +11,23 @@ public class Employee {
     private final String name;
 
     public Employee(String id, String name) {
-        this.id = Objects.requireNonNull(id, "Employee ID cannot be null");
-        this.name = Objects.requireNonNull(name, "Employee name cannot be null");
+        Objects.requireNonNull(id, "Employee ID cannot be null");
+        Objects.requireNonNull(name, "Employee name cannot be null");
 
         if (id.isBlank()) {
-            throw new IllegalArgumentException("Employee ID cannot be blank");
+            throw new InvalidPayrollInputException(
+                    "Employee ID cannot be blank"
+            );
         }
 
         if (name.isBlank()) {
-            throw new IllegalArgumentException("Employee name cannot be blank");
+            throw new InvalidPayrollInputException(
+                    "Employee name cannot be blank"
+            );
         }
+
+        this.id = id;
+        this.name = name;
     }
 
     public String getId() {

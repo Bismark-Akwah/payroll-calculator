@@ -48,19 +48,17 @@ public class BandBasedTaxCalculator implements TaxCalculator {
     }
 
     private void validateTaxBands() {
-
         for (int i = 0; i < taxBands.size() - 1; i++) {
-
             TaxBand current = taxBands.get(i);
             TaxBand next = taxBands.get(i + 1);
 
             if (current.upperBound() == null
-                    || current.upperBound().compareTo(
-                    next.lowerBound()) > 0) {
+                    || current.upperBound().compareTo(next.lowerBound()) != 0) {
 
                 throw new InvalidTaxConfigurationException(
-                        "Overlapping tax bands: "
-                                + current.name() + " and " + next.name());
+                        "Tax bands must be continuous and non-overlapping: "
+                                + current.name() + " and " + next.name()
+                );
             }
         }
     }
