@@ -58,6 +58,16 @@ class GrossPayCalculatorTest {
     }
 
     @Test
+    void allowsZeroHourlyRate() {
+        BigDecimal result = calculator.calculateGrossPay(
+                new BigDecimal("40"),
+                BigDecimal.ZERO
+        );
+
+        assertMoneyEquals("0", result);
+    }
+
+    @Test
     void rejectsNegativeHoursWorked() {
         assertThrows(
                 InvalidPayrollInputException.class,

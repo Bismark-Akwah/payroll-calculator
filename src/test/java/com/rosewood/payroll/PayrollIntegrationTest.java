@@ -14,27 +14,38 @@ class PayrollIntegrationTest {
 
     @Test
     void calculatesPayrollUsingRealComponents() {
-        // Real tax configuration
+
+        Employee employee = new Employee("e1", "Efua Sarpong");
+
+        EmployeeRepository repository =
+                new InMemoryEmployeeRepository(List.of(employee));
+
         List<TaxBand> taxBands = List.of(
-                new TaxBand("LOW",
+                new TaxBand(
+                        "LOW",
                         new BigDecimal("0"),
                         new BigDecimal("1000"),
-                        new BigDecimal("0.05")),
-
-                new TaxBand("MEDIUM",
+                        new BigDecimal("0.05")
+                ),
+                new TaxBand(
+                        "MEDIUM",
                         new BigDecimal("1000"),
                         new BigDecimal("5000"),
-                        new BigDecimal("0.15")),
-
-                new TaxBand("HIGH",
+                        new BigDecimal("0.15")
+                ),
+                new TaxBand(
+                        "HIGH",
                         new BigDecimal("5000"),
                         null,
-                        new BigDecimal("0.25"))
+                        new BigDecimal("0.25")
+                )
         );
 
-        EmployeeRepository repository = new InMemoryEmployeeRepository();
-        GrossPayCalculator grossPayCalculator = new GrossPayCalculator();
-        TaxCalculator taxCalculator = new BandBasedTaxCalculator(taxBands);
+        GrossPayCalculator grossPayCalculator =
+                new GrossPayCalculator();
+
+        TaxCalculator taxCalculator =
+                new BandBasedTaxCalculator(taxBands);
 
         PayrollCalculator payrollCalculator = new PayrollCalculator(
                 repository,
