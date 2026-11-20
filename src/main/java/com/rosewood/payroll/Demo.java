@@ -7,13 +7,19 @@ import com.rosewood.payroll.tax.TaxCalculator;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 public class Demo {
 
     public static void main(String[] args) {
 
         EmployeeRepository employeeRepository =
-                new InMemoryEmployeeRepository();
+                new InMemoryEmployeeRepository(
+                        List.of(
+                                new Employee("e1", "Efua Sarpong"),
+                                new Employee("e2", "Kwame Owusu")
+                        )
+                );
 
         GrossPayCalculator grossPayCalculator =
                 new GrossPayCalculator();

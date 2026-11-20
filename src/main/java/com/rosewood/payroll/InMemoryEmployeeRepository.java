@@ -1,5 +1,6 @@
 package com.rosewood.payroll;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -9,9 +10,21 @@ public class InMemoryEmployeeRepository implements EmployeeRepository {
 
     private final Map<String, Employee> employees = new HashMap<>();
 
-    public InMemoryEmployeeRepository() {
-        employees.put("e1", new Employee("e1", "Efua Sarpong"));
-        employees.put("e2", new Employee("e2", "Kwame Owusu"));
+    public InMemoryEmployeeRepository(Collection<Employee> employees) {
+        Objects.requireNonNull(employees, "Employees cannot be null");
+
+        for (Employee employee : employees) {
+            Objects.requireNonNull(employee, "Employee cannot be null");
+
+            Employee existingEmployee =
+                    this.employees.putIfAbsent(employee.getId(), employee);
+
+            if (existingEmployee != null) {
+                throw new IllegalArgumentException(
+                        "Duplicate employee ID: " + employee.getId()
+                );
+            }
+        }
     }
 
     @Override
